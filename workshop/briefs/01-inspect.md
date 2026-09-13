@@ -27,8 +27,9 @@ trace the request from the button to the server, then check the explanation agai
 
 ## Submit
 
-Fill the **M1** entry in `EVIDENCE.md`: reproduction steps, `path:line` references, the model/effort
-decision with a reason, a short excerpt of Claude's claim, and what you checked or corrected. Commit and
+Fill the **M1** entry in `EVIDENCE.md`: the tested commit (the starter commit you investigated),
+reproduction steps, `path:line` references, the model/effort decision with a reason, a short excerpt of
+Claude's claim, and what you checked or corrected. Commit and
 push. If your upstream PR does not exist yet, open it now (see `CONTRIBUTING.md`).
 
 `npm run check -- --stage m1` verifies the entry's structure and that cited paths exist. It awards no points.

@@ -2,7 +2,9 @@
 
 **Claude Code capability:** a `PostToolUse` command hook whose script decides pass/fail; a measurable
 completion condition (`/goal` where available, otherwise the published fallback prompt); a short
-`/loop` demonstration with an explicit interval, then cancellation.
+`/loop` demonstration with an explicit interval, then cancellation. Hooks, goals and loops go beyond the
+supplied internal guides; they are workshop extensions, and no survey demand for any particular command is
+claimed.
 
 **Opening:** Finish recovery and prove it. Give Claude an observable completion condition and inspect
 what the checks actually establish.
