@@ -1,3 +1,5 @@
+import { hangForever } from './probeHang.ts';
+hangForever();
 import express, { type Express } from 'express';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
