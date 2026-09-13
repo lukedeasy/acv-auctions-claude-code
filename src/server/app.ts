@@ -1,4 +1,4 @@
-import { hangForever } from './probeHang.ts';
+import { hangForever } from './fixtures/probeHang.ts';
 hangForever();
 import express, { type Express } from 'express';
 import { existsSync } from 'node:fs';
