@@ -47,6 +47,8 @@ const plans = {
   m6: ['ENV-01', 'TYPE-01', 'LINT-01', 'SYS-01', 'SYS-02', 'SYS-03', 'SVC-01', 'BASE-01', 'BASE-02', ...ALL_AC, 'HOOK-01', 'DOC-M6'],
 };
 const NOT_REQUIRED = new Set(['BASE-02-STRONG']);
+// Unfilled outline values: empty, an HTML comment, a bare dash, or the usual TODO markers.
+const PLACEHOLDER = /^(?:<[^>]*>|\(fill in\)|TODO|TBD|_?not filled_?|—|-)?$/i;
 const DESCRIPTIONS = {
   'ENV-01': 'Runtime matches .node-version and dependencies are installed',
   'TYPE-01': 'TypeScript type check',
@@ -345,8 +347,6 @@ function fieldValue(text, label) {
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
-const PLACEHOLDER = /^(?:<[^>]*>|\(fill in\)|TODO|TBD|_?not filled_?|—|-)?$/i;
 
 function checkEvidenceEntry(moduleId, requiredFields) {
   const text = readDoc('EVIDENCE.md');
