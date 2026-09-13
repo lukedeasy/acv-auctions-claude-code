@@ -109,7 +109,7 @@ try {
   }
 
   runSimple('DOC-M1', () => checkEvidenceEntry('M1', ['Tested commit', 'Reproduction', 'Source references', 'Model/effort', 'Decision']));
-  runSimple('DOC-M2', () => [...checkSpec(), ...checkEvidenceEntryQuiet('M2', ['Tested commit', 'Clarification', 'Decision'])]);
+  runSimple('DOC-M2', () => [...checkSpec(), ...checkEvidenceEntryQuiet('M2', ['Tested commit', 'Clarification', 'Decision'], { requireCitedPath: false })]);
   runSimple('DOC-M3', () => [...checkPlan(), ...checkEvidenceEntryQuiet('M3', ['Tested commit', 'Subagent', 'Decision'])]);
   runSimple('DOC-M6', () => checkM6Evidence());
 } catch (error) {
@@ -348,7 +348,7 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function checkEvidenceEntry(moduleId, requiredFields) {
+function checkEvidenceEntry(moduleId, requiredFields, { requireCitedPath = true } = {}) {
   const text = readDoc('EVIDENCE.md');
   const body = section(text, moduleId);
   if (body === null) return [`EVIDENCE.md has no "## ${moduleId}" section`];
@@ -360,23 +360,24 @@ function checkEvidenceEntry(moduleId, requiredFields) {
   }
   const commit = fieldValue(body, 'Tested commit');
   if (commit && !/^[a-f0-9]{7,40}\b/i.test(commit)) problems.push(`${moduleId}: "Tested commit:" should start with a commit SHA (7–40 hex characters)`);
-  problems.push(...checkCitedPaths(body, moduleId));
+  problems.push(...checkCitedPaths(body, moduleId, requireCitedPath));
   return problems;
 }
 
-function checkEvidenceEntryQuiet(moduleId, requiredFields) {
+function checkEvidenceEntryQuiet(moduleId, requiredFields, options) {
   try {
-    return checkEvidenceEntry(moduleId, requiredFields);
+    return checkEvidenceEntry(moduleId, requiredFields, options);
   } catch (error) {
     return [String(error.message)];
   }
 }
 
-function checkCitedPaths(body, label) {
+// M1 and M3 entries must cite at least one source path; other entries only need any cited path to exist.
+function checkCitedPaths(body, label, requireOne = true) {
   const problems = [];
   const cited = new Set();
   for (const match of body.matchAll(/`?((?:src|tests|scripts|workshop|fixtures|\.claude)\/[\w./-]+?)(?::\d+(?:-\d+)?)?`?(?=[\s,;)`]|$)/g)) cited.add(match[1]);
-  if (cited.size === 0) problems.push(`${label}: no source path is cited (expected at least one path under src/, tests/ or similar)`);
+  if (requireOne && cited.size === 0) problems.push(`${label}: no source path is cited (expected at least one path under src/, tests/ or similar)`);
   for (const rel of cited) {
     if (!existsSync(path.join(root, rel))) problems.push(`${label}: cited path does not exist: ${rel}`);
   }
@@ -443,7 +444,7 @@ function checkPlan() {
 }
 
 function checkM6Evidence() {
-  const problems = checkEvidenceEntry('M6', ['Tested commit', 'Outgoing review target', 'Received findings', 'Readiness', 'Decision']);
+  const problems = checkEvidenceEntry('M6', ['Tested commit', 'Outgoing review target', 'Received findings', 'Readiness', 'Decision'], { requireCitedPath: false });
   const body = section(readDoc('EVIDENCE.md'), 'M6') ?? '';
   const target = fieldValue(body, 'Outgoing review target');
   if (target && !/[a-f0-9]{40}/i.test(target)) problems.push('M6: "Outgoing review target:" must include the full 40-character SHA you reviewed');
