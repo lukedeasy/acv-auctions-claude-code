@@ -1,0 +1,12 @@
+export const ALL_AC: string[];
+export const PLACEHOLDER: RegExp;
+export function readDoc(root: string, name: string): string;
+export function section(markdown: string, heading: string): string | null;
+export function fieldValue(text: string, label: string): string | null;
+export function citedPaths(body: string): string[];
+export function checkCitedPaths(root: string, body: string, label: string, requireOne?: boolean): string[];
+export function checkEvidenceEntry(root: string, moduleId: string, requiredFields: string[], options?: { requireCitedPath?: boolean }): string[];
+export function checkEvidenceEntryQuiet(root: string, moduleId: string, requiredFields: string[], options?: { requireCitedPath?: boolean }): string[];
+export function checkSpec(root: string): string[];
+export function checkPlan(root: string): string[];
+export function checkM6Evidence(root: string): string[];

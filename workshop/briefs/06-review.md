@@ -20,9 +20,16 @@ Claude's review assistance, verify the result and give the author useful evidenc
 
 5. Return to your own workspace. For each received finding record `accepted_fixed`,
    `accepted_unresolved` or `disputed_with_evidence` (a dispute cites source or check output).
-6. Run `npm run check -- --stage m6 --json workshop/evidence/m6-check.json`. Push the M6 commit.
-7. Record `ready_for_merge` or `changes_required` in `EVIDENCE.md` with the evidence. Upstream `main`
-   stays unchanged; nothing is merged during class.
+6. Commit your corrections. From that clean, committed checkout run
+   `npm run check -- --stage m6 --json workshop/evidence/m6-check.json`. The result names the code
+   commit it tested.
+7. Write the **M6** entry in `EVIDENCE.md` from that result: `Tested commit` is the commit you just
+   checked, `Final checks` cites `workshop/evidence/m6-check.json`, `Readiness` is `ready_for_merge`
+   only if every required check passed, otherwise `changes_required` with the unresolved items named.
+8. Run `npm run check -- --stage evidence`. It verifies the entry against the cited result (same tested
+   commit, readiness consistent with the checks). Then commit and push: that later commit is your M6
+   submission; it does not need to contain its own SHA. Upstream `main` stays unchanged; nothing is
+   merged during class.
 
 ## How M6 is graded
 

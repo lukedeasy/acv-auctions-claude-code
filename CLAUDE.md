@@ -6,7 +6,8 @@ Vitest + Playwright (checks). Node 24. In-memory sample data; restarting the API
 ## Commands
 
 - `npm ci` then `npm run prepare:local` once. `npm run dev` starts API (4100) and UI (5173).
-- `npm run check -- --stage <baseline|fast|m1|m2|m3|m4|m5|m6>`; add `--json <path>` for a result file.
+- `npm run check -- --stage <baseline|fast|m1|m2|m3|m4|m5|m6|evidence>`; add `--json <path>` for a result file.
+- M6 order: commit code → `--stage m6 --json workshop/evidence/m6-check.json` → write the M6 evidence entry from that result → `--stage evidence` → commit.
 - `fast` has no browser and is what the PostToolUse hook runs after edits to report source files.
 
 ## Where things are

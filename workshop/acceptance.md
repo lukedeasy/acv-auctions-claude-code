@@ -55,8 +55,13 @@ npm run check -- --stage baseline   # starter health; expected green before you 
 npm run check -- --stage fast       # type check + service + structure, no browser (the hook uses this)
 npm run check -- --stage m4         # fast + AC-01..AC-03 HTTP-level
 npm run check -- --stage m5         # everything incl. browser journeys and hook tests
-npm run check -- --stage m6         # m5 + final evidence structure
+npm run check -- --stage m6         # same executable checks on your final code; writes the result you cite in M6
+npm run check -- --stage evidence   # document checks only: EVIDENCE/SPEC/PLAN structure and M6 consistency with the cited m6 result
 ```
+
+M6 order: commit code → `--stage m6 --json workshop/evidence/m6-check.json` → write the M6 entry from that
+result → `--stage evidence` → commit. The result file records the code commit it tested; your evidence
+commit comes afterwards and never needs to contain its own SHA.
 
 Add `--json <path>` to write the machine-readable result. Exit 0 pass, 1 a check failed, 2 tooling problem.
 The public checks give feedback. The trainer reruns a private copy of the same checks on your captured

@@ -29,7 +29,7 @@ six briefs in `workshop/briefs/`. Record your work in `SPEC.md`, `PLAN.md` and `
 | --- | --- |
 | `npm run dev` | Starts API and UI together; Ctrl+C stops both. Ports via `.env` (see `.env.example`). |
 | `npm run build` / `npm run start` | Builds to `dist/` and serves app + API from one port (`INSPECTION_DESK_API_PORT`, default 4100). |
-| `npm run check -- --stage <stage>` | `baseline`, `fast`, `m1`…`m6`. `--json <path>` writes a result file. Exit 0 pass, 1 failed check, 2 tooling problem. |
+| `npm run check -- --stage <stage>` | `baseline`, `fast`, `m1`…`m6`, `evidence`. `--json <path>` writes a result file. Exit 0 pass, 1 failed check, 2 tooling problem. |
 | `npm run test:unit` / `npm run test:e2e` | Raw Vitest / Playwright runs (the staged command is the documented path). |
 
 Browser checks use ports 4190/5190 so they do not collide with `npm run dev`.

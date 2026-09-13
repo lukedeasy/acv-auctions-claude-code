@@ -32,6 +32,8 @@ export const PROTECTED_FILES = [
   'src/server/reports/legacyGenerate.ts',
   'src/server/fixtures/loadFixtures.ts',
   'scripts/check.mjs',
+  'scripts/lib/evidence.mjs',
+  'scripts/lib/evidence.d.mts',
   'scripts/probe-built-app.mjs',
   'scripts/protected-manifest.mjs',
   'tests/helpers/testApp.ts',
@@ -42,6 +44,7 @@ export const PROTECTED_FILES = [
   'tests/acceptance/journeys.spec.ts',
   'tests/structure/dependency-rule.test.ts',
   'tests/structure/protected-files.test.ts',
+  'tests/structure/evidence-flow.test.ts',
   'tests/hooks/check-report-change.test.ts',
   '.github/workflows/check-pr.yml',
 ];

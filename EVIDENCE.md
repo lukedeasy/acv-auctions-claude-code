@@ -54,10 +54,12 @@ Never paste a full personal transcript. A short exchange or tool-result excerpt 
 
 ## M6
 
-- Tested commit:
+<!-- Order: commit your code → `npm run check -- --stage m6 --json workshop/evidence/m6-check.json` → fill this entry from that result → `npm run check -- --stage evidence` → commit. -->
+
+- Tested commit: <!-- the code commit the m6 result names (testedCommit in the JSON); this entry is committed afterwards -->
 - Outgoing review target: <!-- author login and the full 40-character SHA you reviewed -->
 - Received findings: <!-- one line per finding: accepted_fixed | accepted_unresolved | disputed_with_evidence, or "none received" -->
-- Final checks:
-- Readiness: <!-- ready_for_merge | changes_required -->
+- Final checks: <!-- workshop/evidence/m6-check.json -->
+- Readiness: <!-- ready_for_merge only if every required check in that result passed; otherwise changes_required and name what is unresolved -->
 - Decision:
 - Unresolved:

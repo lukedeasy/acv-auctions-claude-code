@@ -2,7 +2,7 @@
 /**
  * Staged check runner for Inspection Desk.
  *
- *   npm run check -- --stage <baseline|fast|m1|m2|m3|m4|m5|m6> [--json <path>]
+ *   npm run check -- --stage <baseline|fast|m1|m2|m3|m4|m5|m6|evidence> [--json <path>]
  *
  * Exit 0: every required check for the stage passed.
  * Exit 1: at least one required check failed (an assertion or requirement).
@@ -17,15 +17,17 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkEvidenceEntry, checkEvidenceEntryQuiet, checkM6Evidence, checkPlan, checkSpec } from './lib/evidence.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = parseArgs(process.argv.slice(2));
 const stage = args.stage;
-const STAGES = ['baseline', 'fast', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6'];
+const STAGES = ['baseline', 'fast', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6', 'evidence'];
 if (!stage || !STAGES.includes(stage)) {
   console.error(`Usage: npm run check -- --stage <${STAGES.join('|')}> [--json <path>]`);
   process.exit(2);
 }
+const BINDING_FILE = '.check-binding.json';
 const outDir = path.join(root, '.check-output', stage);
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
@@ -44,11 +46,12 @@ const plans = {
   m3: ['ENV-01', 'TYPE-01', 'LINT-01', 'SVC-01', 'BASE-01', 'BASE-02', 'BASE-02-STRONG', 'DOC-M1', 'DOC-M2', 'DOC-M3'],
   m4: ['TYPE-01', 'SVC-01', 'SYS-02', 'AC-01', 'AC-02', 'AC-03'],
   m5: ['ENV-01', 'TYPE-01', 'LINT-01', 'SYS-01', 'SYS-02', 'SYS-03', 'SVC-01', 'BASE-01', 'BASE-02', ...ALL_AC, 'HOOK-01'],
-  m6: ['ENV-01', 'TYPE-01', 'LINT-01', 'SYS-01', 'SYS-02', 'SYS-03', 'SVC-01', 'BASE-01', 'BASE-02', ...ALL_AC, 'HOOK-01', 'DOC-M6'],
+  // m6 is the executable final stage. Its document check lives in the separate `evidence` stage because the
+  // M6 evidence entry cites the m6 result file: run m6, write the entry from that result, then run evidence.
+  m6: ['ENV-01', 'TYPE-01', 'LINT-01', 'SYS-01', 'SYS-02', 'SYS-03', 'SVC-01', 'BASE-01', 'BASE-02', ...ALL_AC, 'HOOK-01'],
+  evidence: ['DOC-M1', 'DOC-M2', 'DOC-M3', 'DOC-M6'],
 };
 const NOT_REQUIRED = new Set(['BASE-02-STRONG']);
-// Unfilled outline values: empty, an HTML comment, a bare dash, or the usual TODO markers.
-const PLACEHOLDER = /^(?:<[^>]*>|\(fill in\)|TODO|TBD|_?not filled_?|—|-)?$/i;
 const DESCRIPTIONS = {
   'ENV-01': 'Runtime matches .node-version and dependencies are installed',
   'TYPE-01': 'TypeScript type check',
@@ -70,11 +73,11 @@ const DESCRIPTIONS = {
   'DOC-M1': 'EVIDENCE.md M1 entry structure and cited paths',
   'DOC-M2': 'SPEC.md structure, unique acceptance IDs and M2 evidence entry',
   'DOC-M3': 'PLAN.md increments, acceptance mapping, estimates, subagent evidence and M3 entry',
-  'DOC-M6': 'EVIDENCE.md M6 entry: review target, dispositions and readiness decision',
+  'DOC-M6': 'EVIDENCE.md M6 entry: review target, dispositions, and a readiness decision that agrees with the cited m6 check result',
 };
 
 const plan = plans[stage];
-const fastModeBrowserless = stage === 'fast' || stage === 'm4';
+const fastModeBrowserless = stage === 'fast' || stage === 'm4' || stage === 'evidence';
 
 // ---------- execute ----------
 try {
@@ -108,10 +111,10 @@ try {
     results.push(mergeTagged(id, relevant, tag));
   }
 
-  runSimple('DOC-M1', () => checkEvidenceEntry('M1', ['Tested commit', 'Reproduction', 'Source references', 'Model/effort', 'Decision']));
-  runSimple('DOC-M2', () => [...checkSpec(), ...checkEvidenceEntryQuiet('M2', ['Tested commit', 'Clarification', 'Decision'], { requireCitedPath: false })]);
-  runSimple('DOC-M3', () => [...checkPlan(), ...checkEvidenceEntryQuiet('M3', ['Tested commit', 'Subagent', 'Decision'])]);
-  runSimple('DOC-M6', () => checkM6Evidence());
+  runSimple('DOC-M1', () => checkEvidenceEntry(root, 'M1', ['Tested commit', 'Reproduction', 'Source references', 'Model/effort', 'Decision']));
+  runSimple('DOC-M2', () => [...checkSpec(root), ...checkEvidenceEntryQuiet(root, 'M2', ['Tested commit', 'Clarification', 'Decision'], { requireCitedPath: false })]);
+  runSimple('DOC-M3', () => [...checkPlan(root), ...checkEvidenceEntryQuiet(root, 'M3', ['Tested commit', 'Subagent', 'Decision'])]);
+  runSimple('DOC-M6', () => checkM6Evidence(root));
 } catch (error) {
   console.error(`[check] infrastructure error: ${error && error.stack ? error.stack : error}`);
   finish(2);
@@ -324,143 +327,37 @@ function mergeTagged(id, runs, tag) {
   return entry;
 }
 
-// ---------- document structure checks ----------
-function readDoc(name) {
-  const file = path.join(root, name);
-  if (!existsSync(file)) throw new Error(`${name} is missing`);
-  return readFileSync(file, 'utf8');
-}
-
-function section(markdown, heading) {
-  const lines = markdown.split('\n');
-  const start = lines.findIndex((line) => /^##\s+/.test(line) && line.replace(/^##\s+/, '').trim().startsWith(heading));
-  if (start < 0) return null;
-  const end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
-  return lines.slice(start + 1, end < 0 ? undefined : end).join('\n');
-}
-
-function fieldValue(text, label) {
-  const match = new RegExp(`^\\s*(?:[-*]\\s*)?\\*{0,2}${escapeRegExp(label)}\\*{0,2}\\s*:\\s*(.*)$`, 'mi').exec(text);
-  return match ? match[1].trim() : null;
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function checkEvidenceEntry(moduleId, requiredFields, { requireCitedPath = true } = {}) {
-  const text = readDoc('EVIDENCE.md');
-  const body = section(text, moduleId);
-  if (body === null) return [`EVIDENCE.md has no "## ${moduleId}" section`];
-  const problems = [];
-  for (const field of requiredFields) {
-    const value = fieldValue(body, field);
-    if (value === null) problems.push(`${moduleId}: missing field "${field}:"`);
-    else if (PLACEHOLDER.test(value)) problems.push(`${moduleId}: field "${field}:" is not filled in`);
-  }
-  const commit = fieldValue(body, 'Tested commit');
-  if (commit && !/^[a-f0-9]{7,40}\b/i.test(commit)) problems.push(`${moduleId}: "Tested commit:" should start with a commit SHA (7–40 hex characters)`);
-  problems.push(...checkCitedPaths(body, moduleId, requireCitedPath));
-  return problems;
-}
-
-function checkEvidenceEntryQuiet(moduleId, requiredFields, options) {
-  try {
-    return checkEvidenceEntry(moduleId, requiredFields, options);
-  } catch (error) {
-    return [String(error.message)];
-  }
-}
-
-// M1 and M3 entries must cite at least one source path; other entries only need any cited path to exist.
-function checkCitedPaths(body, label, requireOne = true) {
-  const problems = [];
-  const cited = new Set();
-  for (const match of body.matchAll(/`?((?:src|tests|scripts|workshop|fixtures|\.claude)\/[\w./-]+?)(?::\d+(?:-\d+)?)?`?(?=[\s,;)`]|$)/g)) cited.add(match[1]);
-  if (requireOne && cited.size === 0) problems.push(`${label}: no source path is cited (expected at least one path under src/, tests/ or similar)`);
-  for (const rel of cited) {
-    if (!existsSync(path.join(root, rel))) problems.push(`${label}: cited path does not exist: ${rel}`);
-  }
-  return problems;
-}
-
-function checkSpec() {
-  const text = readDoc('SPEC.md');
-  const problems = [];
-  for (const heading of ['Problem and evidence', 'Intended behavior', 'Failure cases', 'Constraints', 'Acceptance criteria', 'Scope', 'Open decisions']) {
-    const body = section(text, heading);
-    if (body === null) problems.push(`SPEC.md: missing "## ${heading}" section`);
-    else if (body.replace(/<!--[\s\S]*?-->/g, '').trim().length < 20) problems.push(`SPEC.md: "## ${heading}" is empty`);
-  }
-  const acceptance = section(text, 'Acceptance criteria') ?? '';
-  const rows = [...acceptance.matchAll(/^\|\s*(AC-0[1-6])\s*\|/gm)].map((m) => m[1]);
-  for (const id of ALL_AC) {
-    const count = rows.filter((row) => row === id).length;
-    if (count === 0) problems.push(`SPEC.md: acceptance table has no row for ${id}`);
-    if (count > 1) problems.push(`SPEC.md: acceptance ID ${id} appears ${count} times; IDs must be unique`);
-  }
-  const acceptanceLines = acceptance.split('\n').filter((line) => /^\|\s*AC-0[1-6]\s*\|/.test(line));
-  for (const line of acceptanceLines) {
-    const cells = line.split('|').map((cell) => cell.trim()).filter((_, index, all) => index > 0 && index < all.length - 1);
-    if (cells.length < 4) problems.push(`SPEC.md: row "${cells[0]}" needs example, expected result and planned check columns`);
-    else if (cells.slice(1).some((cell) => cell.length === 0 || PLACEHOLDER.test(cell))) problems.push(`SPEC.md: row "${cells[0]}" has an unfilled cell`);
-  }
-  return problems;
-}
-
-function checkPlan() {
-  const text = readDoc('PLAN.md');
-  const problems = [];
-  for (const heading of ['Kind of change', 'Increment A', 'Increment B', 'Acceptance mapping', 'Change estimate', 'Subagent investigation', 'Alternatives considered']) {
-    const body = section(text, heading);
-    if (body === null) problems.push(`PLAN.md: missing "## ${heading}" section`);
-    else if (body.replace(/<!--[\s\S]*?-->/g, '').trim().length < 20) problems.push(`PLAN.md: "## ${heading}" is empty`);
-  }
-  const mapping = section(text, 'Acceptance mapping') ?? '';
-  for (const id of ALL_AC) {
-    const row = mapping.split('\n').find((line) => new RegExp(`^\\|\\s*${id}\\s*\\|`).test(line));
-    if (!row) {
-      problems.push(`PLAN.md: acceptance mapping has no row for ${id}`);
-      continue;
-    }
-    const cells = row.split('|').map((cell) => cell.trim()).filter((_, index, all) => index > 0 && index < all.length - 1);
-    if (cells.length < 4 || cells.slice(1).some((cell) => cell.length === 0 || PLACEHOLDER.test(cell))) problems.push(`PLAN.md: ${id} row must name the increment, file(s) and check`);
-    else if (!/\b(A|B)\b/.test(cells[1])) problems.push(`PLAN.md: ${id} row must assign increment A or B`);
-  }
-  const estimate = section(text, 'Change estimate') ?? '';
-  for (const field of ['Application code', 'Tests']) {
-    const value = fieldValue(estimate, field);
-    if (value === null) problems.push(`PLAN.md: change estimate missing "${field}:" range`);
-    else if (!/\d+\s*(?:–|-|to)\s*\d+/.test(value)) problems.push(`PLAN.md: "${field}:" should be a range such as 40–80 lines`);
-  }
-  const subagent = section(text, 'Subagent investigation') ?? '';
-  for (const field of ['Question', 'Tools', 'Model', 'Finding', 'Verification', 'Effect on plan']) {
-    const value = fieldValue(subagent, field);
-    if (value === null) problems.push(`PLAN.md: subagent investigation missing "${field}:"`);
-    else if (PLACEHOLDER.test(value)) problems.push(`PLAN.md: subagent "${field}:" is not filled in`);
-  }
-  problems.push(...checkCitedPaths(subagent, 'PLAN.md subagent investigation'));
-  return problems;
-}
-
-function checkM6Evidence() {
-  const problems = checkEvidenceEntry('M6', ['Tested commit', 'Outgoing review target', 'Received findings', 'Readiness', 'Decision'], { requireCitedPath: false });
-  const body = section(readDoc('EVIDENCE.md'), 'M6') ?? '';
-  const target = fieldValue(body, 'Outgoing review target');
-  if (target && !/[a-f0-9]{40}/i.test(target)) problems.push('M6: "Outgoing review target:" must include the full 40-character SHA you reviewed');
-  const readiness = fieldValue(body, 'Readiness');
-  if (readiness && !/^(ready_for_merge|changes_required)\b/.test(readiness)) problems.push('M6: "Readiness:" must be ready_for_merge or changes_required');
-  const findings = fieldValue(body, 'Received findings');
-  if (findings && !/(accepted_fixed|accepted_unresolved|disputed_with_evidence|none received)/.test(body)) problems.push('M6: each received finding needs a disposition: accepted_fixed, accepted_unresolved or disputed_with_evidence (or "none received")');
-  return problems;
-}
-
 // ---------- git and output ----------
+/**
+ * Which code version was tested.
+ *  1. A trainer-written binding file (.check-binding.json) wins: the trusted runner writes it from its own
+ *     records (participant commit, source archive hash, bundle hash) after removing anything with that name
+ *     from the candidate source. Nothing in the candidate or its environment can change it.
+ *  2. Otherwise Git, but only when the repository root IS this project root. A copied tree without .git sitting
+ *     under some other repository must not inherit that repository's commit.
+ *  3. Otherwise unknown (null), stated as such.
+ */
 function describeCommit() {
+  const bindingPath = path.join(root, BINDING_FILE);
+  if (existsSync(bindingPath)) {
+    try {
+      const binding = JSON.parse(readFileSync(bindingPath, 'utf8'));
+      if (binding && typeof binding.testedCommit === 'string' && /^[a-f0-9]{40}$/.test(binding.testedCommit)) {
+        return { sha: binding.testedCommit, dirty: false, source: 'trainer-binding', binding };
+      }
+      return { sha: null, dirty: null, source: 'binding-invalid', binding: null };
+    } catch {
+      return { sha: null, dirty: null, source: 'binding-invalid', binding: null };
+    }
+  }
+  const top = spawnSync('git', ['rev-parse', '--show-toplevel'], { cwd: root, encoding: 'utf8' });
+  if (top.status !== 0) return { sha: null, dirty: null, source: 'none', binding: null };
+  const repoRoot = path.resolve(top.stdout.trim());
+  if (repoRoot !== path.resolve(root)) return { sha: null, dirty: null, source: 'enclosing-repository-ignored', binding: null };
   const rev = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' });
-  if (rev.status !== 0) return { sha: null, dirty: null };
+  if (rev.status !== 0) return { sha: null, dirty: null, source: 'none', binding: null };
   const status = spawnSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: root, encoding: 'utf8' });
-  return { sha: rev.stdout.trim(), dirty: status.status === 0 ? status.stdout.trim().length > 0 : null };
+  return { sha: rev.stdout.trim(), dirty: status.status === 0 ? status.stdout.trim().length > 0 : null, source: 'git', binding: null };
 }
 
 function finish(forcedExit) {
@@ -474,7 +371,12 @@ function finish(forcedExit) {
     startedAt,
     finishedAt: new Date().toISOString(),
     testedCommit: commit.sha,
+    testedCommitSource: commit.source,
     workingTreeDirty: commit.dirty,
+    // Present only when the trusted runner bound this run to a captured submission.
+    binding: commit.binding
+      ? { submissionId: commit.binding.submissionId ?? null, sourceArchiveHash: commit.binding.sourceArchiveHash ?? null, checkBundleHash: commit.binding.checkBundleHash ?? null, boundBy: commit.binding.boundBy ?? null, boundAt: commit.binding.boundAt ?? null }
+      : null,
     node: process.versions.node,
     exitCode,
     requiredPassed: required.filter((r) => r.status === 'pass').length,
