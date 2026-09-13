@@ -177,7 +177,8 @@ test.describe('acceptance journeys', () => {
     await openInspection(page, 'insp-001');
     await panel(page).generate.click();
     const runA = await waitForRun(request, 'insp-001', ['pending']);
-    // Delay one status response for run A so it arrives after navigation to B.
+    // Delay one status response for run A so it arrives after navigation to B. Wait until that delayed
+    // request has actually been issued before navigating, so a late answer is guaranteed to be in flight.
     let delayed = false;
     await page.route(`**/api/report-runs/${runA.id}`, async (route) => {
       if (!delayed) {
@@ -186,6 +187,7 @@ test.describe('acceptance journeys', () => {
       }
       await route.continue();
     });
+    await page.waitForRequest((req) => req.url().endsWith(`/api/report-runs/${runA.id}`), { timeout: 5000 });
     await page.getByRole('link', { name: 'Back to vehicles' }).click();
     await page.getByTestId('vehicle-row-veh-002').getByRole('link', { name: 'Open inspection' }).click();
     await expect(page.getByTestId('inspection-page')).toHaveAttribute('data-inspection-id', 'insp-002');

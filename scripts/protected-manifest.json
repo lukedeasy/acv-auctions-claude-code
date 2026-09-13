@@ -1,6 +1,6 @@
 {
   "contractVersion": "inspection-desk-1.0",
-  "generatedAt": "2026-09-13T02:40:36.994Z",
+  "generatedAt": "2026-09-13T03:03:58.931Z",
   "files": {
     ".github/workflows/check-pr.yml": "671ffc06301070ee6695c53d97ad3450853287eb13113359871e936cf40b0287",
     ".node-version": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f",
@@ -26,7 +26,7 @@
     "src/server/reports/scheduler.ts": "81e26191bad7bc8b32c46d2af46bea84b375e1b5c9ee80fb210e8f3a1c48a962",
     "src/shared/reportTypes.ts": "3c45721c04a19944e3c1c776034d51a1ec20117c30f0eb86fca984ba3c03e0ae",
     "tests/acceptance/api.test.ts": "21e402f630d20b4de7344be84cf41bff00f1320301694057067a585bf3779dca",
-    "tests/acceptance/journeys.spec.ts": "e5c719f6eb9320738041c6d7e757e05f8ce8aebd9adfc1b9c679f6c7ec8289c7",
+    "tests/acceptance/journeys.spec.ts": "25d291c114315e437666db08c56d5e33f7f8ec76bf215ace3d8487972c36bb55",
     "tests/baseline/api.test.ts": "a3a6f78a37de7d6b843d1f39709d5785d07bc6b895918811fb83168e976a8ab9",
     "tests/baseline/screens.spec.ts": "b15fac682a5166f5df9fa72994d978340865c02b2d9e1761939dcd1633af1396",
     "tests/helpers/browser.ts": "92acc2e022c237100ceb9f74f545980f1e27244cc1ef1200d0f8db6c8ccf6cb1",
