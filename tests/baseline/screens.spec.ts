@@ -42,16 +42,17 @@ test.describe('[BASE-01] screens', () => {
     await expect(page.getByRole('link', { name: 'Back to vehicles' })).toBeVisible();
   });
 
-  test('[BASE-01] legacy generation shows generating, then a report link that opens the expected document', async ({ page }) => {
+  test('[BASE-01] generation shows progress, then a report link that opens the expected document', async ({ page }) => {
+    // Path-agnostic: passes on the older synchronous path and on the modernized run-based path (automatic mode).
     await openInspection(page, 'insp-001');
     const p = panel(page);
     await p.generate.click();
-    await expect(p.status).toHaveText('Generating report…');
+    await expect(p.status).toHaveText(/Requesting report…|Report queued|Generating report…/);
     await expect(p.generate).toBeDisabled();
     await expect(p.status).toHaveText('Report ready', { timeout: 5000 });
     await expect(p.generate).toBeEnabled();
     await p.open.click();
-    await expect(page).toHaveURL(/\/reports\/legacy-/);
+    await expect(page).toHaveURL(/\/reports\/[^/]+$/);
     await expect(page.getByRole('heading', { name: /Report: 2021 Toyota RAV4/ })).toBeVisible();
     await expect(page.getByTestId('report-revision')).toHaveText('1');
     const expected = expectedReports.find((r) => r.inspectionId === 'insp-001')!;

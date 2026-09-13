@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SEVERITIES, type Finding, type Inspection, type ReportDocument, type Vehicle } from '../../shared/reportTypes.ts';
@@ -68,9 +68,15 @@ function readJson(filePath: string): unknown {
 }
 
 export function defaultFixtureDir(): string {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  // src/server/fixtures → repository root → fixtures/
-  return path.resolve(here, '..', '..', '..', 'fixtures');
+  if (process.env.INSPECTION_DESK_FIXTURE_DIR) return path.resolve(process.env.INSPECTION_DESK_FIXTURE_DIR);
+  // Walk up from this module (src/server/fixtures or dist/server/server/fixtures) to the repository root.
+  let dir = path.dirname(fileURLToPath(import.meta.url));
+  for (let i = 0; i < 6; i += 1) {
+    const candidate = path.join(dir, 'fixtures', 'vehicles.json');
+    if (existsSync(candidate)) return path.join(dir, 'fixtures');
+    dir = path.dirname(dir);
+  }
+  throw new Error('Could not locate the fixtures directory; set INSPECTION_DESK_FIXTURE_DIR.');
 }
 
 export function loadFixtures(fixtureDir = defaultFixtureDir()): FixtureData {

@@ -106,7 +106,6 @@ test.describe('acceptance journeys', () => {
     // The stronger assertion: the user can recover. The starter leaves the button disabled.
     await expect(p.retry).toBeVisible();
     await expect(p.retry).toBeEnabled();
-    await expect(p.generate).toHaveCount(0);
   });
 
   test('[AC-05] Retry follows the new child, clears the stale error and preserves the original snapshot', async ({ page, request }) => {

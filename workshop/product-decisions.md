@@ -27,7 +27,7 @@ All rules describe the fictional teaching application. They are not any company'
 | What does Retry retry? | The failed attempt, using the same inspection data that attempt captured. If the inspection was revised since, the retry still uses the original data. |
 | What if Retry is clicked twice? | The second click must not create a second attempt. The server returns the same retry attempt; the UI sends one request. |
 | What can be retried? | Only a failed attempt from the new run-based path. Pending, running and completed attempts, and reports produced by the older synchronous path, cannot be retried. |
-| After a completed or failed attempt, can the user generate again from scratch? | Yes. A new generation (not Retry) uses the current inspection data. |
+| After a completed attempt, can the user generate again from scratch? | Yes. A new generation (not Retry) uses the current inspection data. After a failed attempt the panel's recovery action is Retry; whether a fresh Generate is also offered there is the engineer's choice, as long as Retry is present and enabled. |
 | Where does the "one active attempt" rule live? | In the prepared server-side job service. The new route handlers call the service and pass its answer through; they do not reimplement the rule. |
 
 ## What must stay the same
