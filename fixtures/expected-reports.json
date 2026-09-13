@@ -1,0 +1,62 @@
+[
+  {
+    "schemaVersion": 1,
+    "inspectionId": "insp-001",
+    "inspectionRevision": 1,
+    "vehicle": {
+      "id": "veh-001",
+      "stockNumber": "TRAIN-101",
+      "year": 2021,
+      "make": "Toyota",
+      "model": "RAV4",
+      "mileage": 42310,
+      "exteriorColor": "Silver"
+    },
+    "inspectedAt": "2026-08-20T14:00:00.000Z",
+    "inspectorLabel": "Workshop inspector A",
+    "findings": [
+      {
+        "id": "finding-001",
+        "area": "Exterior",
+        "severity": "minor",
+        "description": "Small scratch on the left rear door."
+      },
+      {
+        "id": "finding-002",
+        "area": "Interior",
+        "severity": "info",
+        "description": "Seats and controls inspected."
+      }
+    ]
+  },
+  {
+    "schemaVersion": 1,
+    "inspectionId": "insp-002",
+    "inspectionRevision": 1,
+    "vehicle": {
+      "id": "veh-002",
+      "stockNumber": "TRAIN-102",
+      "year": 2020,
+      "make": "Honda",
+      "model": "Civic",
+      "mileage": 61205,
+      "exteriorColor": "Blue"
+    },
+    "inspectedAt": "2026-08-20T15:00:00.000Z",
+    "inspectorLabel": "Workshop inspector B",
+    "findings": [
+      {
+        "id": "finding-003",
+        "area": "Exterior",
+        "severity": "minor",
+        "description": "Paint chip on the front bumper."
+      },
+      {
+        "id": "finding-004",
+        "area": "Tires",
+        "severity": "major",
+        "description": "Rear tires require replacement."
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+# Public feedback checks for workshop PRs. Read-only, no secrets, no deployment.
+# These results are feedback only. Official scores come from the trainer's private rerun of the
+# trusted check bundle on the captured commit. Never use pull_request_target here.
+name: check-pr
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Node from .node-version
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Baseline stage
+        run: npm run check -- --stage baseline --json .check-output/ci-baseline.json
+      - name: M5 stage (feedback; expected to fail until increments A and B are complete)
+        continue-on-error: true
+        run: npm run check -- --stage m5 --json .check-output/ci-m5.json
+      - name: Upload check results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: check-results
+          path: |
+            .check-output/*.json
+            .check-output/**/result.json
+            .check-output/**/*.log
+          retention-days: 7

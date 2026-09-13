@@ -1,0 +1,20 @@
+[
+  {
+    "id": "veh-001",
+    "stockNumber": "TRAIN-101",
+    "year": 2021,
+    "make": "Toyota",
+    "model": "RAV4",
+    "mileage": 42310,
+    "exteriorColor": "Silver"
+  },
+  {
+    "id": "veh-002",
+    "stockNumber": "TRAIN-102",
+    "year": 2020,
+    "make": "Honda",
+    "model": "Civic",
+    "mileage": 61205,
+    "exteriorColor": "Blue"
+  }
+]

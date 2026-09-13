@@ -1,0 +1,12 @@
+{
+  "inspectionId": "insp-001",
+  "revision": 2,
+  "findings": [
+    {
+      "id": "finding-revision-2",
+      "area": "Exterior",
+      "severity": "info",
+      "description": "Revision two finding for snapshot testing."
+    }
+  ]
+}

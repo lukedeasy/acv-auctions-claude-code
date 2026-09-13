@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.check-output/
+test-results/
+playwright-report/
+.env
+*.log
+.DS_Store
+workshop/evidence/*.tmp
