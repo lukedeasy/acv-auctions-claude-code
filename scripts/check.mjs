@@ -9,12 +9,16 @@
  * Exit 2: infrastructure/tooling prevented a result.
  *
  * Statuses: pass | fail | error | not_run. A failing check and an unrun check stay distinguishable.
+ *
+ * Result channel: the summary is written to the --json path. When the trusted runner supplies an open file
+ * descriptor in INSPECTION_DESK_RESULT_FD, the same summary is also written there, last, after every check
+ * process has exited. Child processes never inherit that descriptor, so submitted code cannot write to it.
  * Checks whose `required` flag is false are diagnostics: they are reported but never change the exit code.
  * Test titles carry tags like "[AC-01]"; a check passes when every tagged test passed and at least one ran.
  */
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, writeSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkEvidenceEntry, checkEvidenceEntryQuiet, checkM6Evidence, checkPlan, checkSpec } from './lib/evidence.mjs';
@@ -386,7 +390,16 @@ function finish(forcedExit) {
   };
   const jsonPath = args.json ? path.resolve(root, args.json) : path.join(outDir, 'result.json');
   mkdirSync(path.dirname(jsonPath), { recursive: true });
-  writeFileSync(jsonPath, `${JSON.stringify(summary, null, 2)}\n`);
+  const serialized = `${JSON.stringify(summary, null, 2)}\n`;
+  writeFileSync(jsonPath, serialized);
+  const resultFd = Number(process.env.INSPECTION_DESK_RESULT_FD ?? '');
+  if (Number.isInteger(resultFd) && resultFd > 2) {
+    try {
+      writeSync(resultFd, serialized);
+    } catch (error) {
+      console.error(`[check] could not write the summary to result fd ${resultFd}: ${error.message}`);
+    }
+  }
   console.log(`\n[check] stage ${stage}: ${summary.requiredPassed}/${summary.requiredTotal} required checks passed → exit ${exitCode}. Result: ${path.relative(root, jsonPath)}`);
   if (exitCode === 1) console.log('[check] Exit 1 = an assertion or requirement failed. Exit 2 = tooling prevented a result.');
   process.exit(exitCode);

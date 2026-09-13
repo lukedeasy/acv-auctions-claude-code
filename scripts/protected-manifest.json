@@ -1,6 +1,6 @@
 {
   "contractVersion": "inspection-desk-1.0",
-  "generatedAt": "2026-09-13T03:49:30.236Z",
+  "generatedAt": "2026-09-13T04:19:02.122Z",
   "files": {
     ".github/workflows/check-pr.yml": "671ffc06301070ee6695c53d97ad3450853287eb13113359871e936cf40b0287",
     ".node-version": "73fb1b615e2043a933be1c0895cde4358036acc28d785692509b822aa53c761f",
@@ -13,7 +13,7 @@
     "package-lock.json": "71657e4c0262f1e2531e9fa35f0e596b8ec370380fd99656cc757aa9854b0c12",
     "package.json": "647545343f45f5beb6338ba61a9a5515c475b3e7ec9dcc85719a49713c399cfd",
     "playwright.config.ts": "656ed3994af17a7099fb2d78b7d71e74010640132a4f300aee9159ebc28bdac4",
-    "scripts/check.mjs": "bbfb1ef33da1ec7d2ea7fb2998cbe41d471113e640ce7c99ba45cf82d1708047",
+    "scripts/check.mjs": "5514c306b27c48e05478a5c94be21719d6eefa1d0154739e55d8e36846b09d36",
     "scripts/lib/evidence.d.mts": "f2d7943995ba32a9c439eb316adb7cf9b7091f3108b74d7127708b085d85c395",
     "scripts/lib/evidence.mjs": "c6c2805f55102096b9582288fabb27b602cce1d3ed80fab1f2dd3605b8178f21",
     "scripts/probe-built-app.mjs": "91b519139a15019cbe3c100eda0349f208b0ac2b2bef67ab7a1cf02e2154fd7f",
