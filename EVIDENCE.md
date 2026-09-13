@@ -8,13 +8,13 @@ Never paste a full personal transcript. A short exchange or tool-result excerpt 
 
 ## M1
 
-- Tested commit:
-- Reproduction: <!-- the steps you took and what you saw -->
-- Source references: <!-- path:line for the state update responsible and what the current test checks -->
-- Model/effort: <!-- what you used and why the task did or did not justify a change -->
+- Tested commit: d1ae24f2af60ab33e63d0925b94f191d96f0178d
+- Reproduction: REHEARSAL (Luke Deasy, facilitator). Reset, ticked Fail next generation, clicked Generate report on /inspections/insp-001; error shown, Generate button stayed disabled.
+- Source references: src/client/reports/ReportPanel.tsx (catch branch never resets isGenerating); tests/baseline/screens.spec.ts [BASE-02] asserts only the alert text.
+- Model/effort: default model and effort; reading three files did not justify a change.
 - Claude excerpt: <!-- a few lines showing the claim you checked -->
-- Decision: <!-- what you corrected, accepted or rejected, and its effect -->
-- Unresolved:
+- Decision: checked the claim in ReportPanel.tsx and confirmed with npm run check -- --stage baseline (BASE-02-STRONG fails on the generating text).
+- Unresolved: none
 
 ## M2
 
