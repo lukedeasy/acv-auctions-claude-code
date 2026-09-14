@@ -10,7 +10,7 @@ trace the request from the button to the server, then check the explanation agai
 ## Do
 
 1. `npm run dev`. Open `http://127.0.0.1:5173/inspections/insp-001`.
-2. In **Workshop controls**, tick **Fail next generation**. Click **Generate report**. Observe the error
+2. In the **Operations** panel, tick **Fail next generation**. Click **Generate report**. Observe the error
    and the button. That is the symptom.
 3. Ask Claude to explain it. Useful starting prompt:
 

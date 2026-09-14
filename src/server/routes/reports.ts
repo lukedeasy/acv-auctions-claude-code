@@ -8,7 +8,7 @@ import { asyncHandler, requireIdParam, requireObjectBody } from '../http.ts';
  * Report generation routes.
  *
  * The legacy synchronous route is prepared and stays available for content comparison.
- * The three run-based routes are the learner's work. They must stay thin: validate the request,
+ * The three run-based routes are the open work on the report-generation ticket. They must stay thin: validate the request,
  * call the prepared job service, and translate the result into the documented response.
  * Handlers here must not import the report builder or the runtime store.
  */
@@ -26,7 +26,7 @@ export function createReportRoutes(deps: { service: ReportJobService; legacy: Le
     }),
   );
 
-  // --- Learner endpoints (starter returns 501 until implemented) ---
+  // --- Run-based endpoints (answer 501 until implemented) ---
 
   router.post(
     '/inspections/:id/report-runs',

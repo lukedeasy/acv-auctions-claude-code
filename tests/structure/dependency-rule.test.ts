@@ -4,7 +4,7 @@
  * they introduce. The legacy module is the one allowed builder caller.
  *
  * Method: parse the import graph starting at the routes module with the TypeScript compiler API,
- * follow relative imports into learner-controlled files, and inspect every reached file.
+ * follow relative imports into files outside the protected set, and inspect every reached file.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -96,7 +96,7 @@ describe('[SYS-02] dependency rule for new report handlers', () => {
     expect(violations, violations.join('\n')).toEqual([]);
   });
 
-  it('[SYS-02] reached learner files do not reference builder/store identifiers by name', () => {
+  it('[SYS-02] reached application files do not reference builder/store identifiers by name', () => {
     const graph = walkGraph();
     const violations: string[] = [];
     for (const facts of graph.values()) {

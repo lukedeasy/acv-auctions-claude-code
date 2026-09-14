@@ -2,7 +2,7 @@
   "name": "inspection-desk",
   "version": "1.0.0",
   "private": true,
-  "description": "Inspection Desk: a fictional vehicle-inspection report workbench used as the teaching repository for an advanced Claude Code workshop.",
+  "description": "Inspection Desk: vehicle-inspection report workbench (React, Vite, Express).",
   "license": "MIT",
   "type": "module",
   "engines": {

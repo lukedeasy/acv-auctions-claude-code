@@ -12,9 +12,9 @@ assigned acceptance path only: **AC-04** and **AC-05**.
 
 ## Steps
 
-1. Click **Reset sample data**. Select **Manual** scheduling. Tick **Fail next generation**.
-2. Open vehicle TRAIN-101 → **Open inspection** (`/inspections/insp-001`).
-3. Click **Generate report**. In Workshop controls the new attempt is selected; click **Begin selected
+1. Click **Reset data**. Select **Manual** scheduling. Tick **Fail next generation**.
+2. Open vehicle STK-20811 → **Open inspection** (`/inspections/insp-001`).
+3. Click **Generate report**. In the Operations panel the new attempt is selected; click **Begin selected
    attempt**, then **Finish selected attempt**.
 4. Check: the panel shows `Report generation failed. Try again.`, does **not** show `Generating report…`
    or `Report ready`, offers an enabled **Retry report**, and shows no **Open report** link.

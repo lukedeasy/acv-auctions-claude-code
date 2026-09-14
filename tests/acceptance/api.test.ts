@@ -1,6 +1,6 @@
 /**
  * HTTP-level acceptance assertions for AC-01–AC-06. These run without a browser.
- * They exercise the three learner endpoints, so they fail on the unmodified starter (501) by design.
+ * They exercise the three run-based endpoints, so they fail on the unmodified starter (501) by design.
  * The browser journeys in journeys.spec.ts cover the visible UI parts of the same cases.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -20,16 +20,16 @@ afterAll(async () => {
   await app.close();
 });
 beforeEach(async () => {
-  await app.api('POST', '/api/workshop/reset', {});
-  await app.api('POST', '/api/workshop/config', { mode: 'manual' });
+  await app.api('POST', '/api/ops/reset', {});
+  await app.api('POST', '/api/ops/config', { mode: 'manual' });
 });
 
 const start = (id: string) => app.api<Start>('POST', `/api/inspections/${id}/report-runs`, {});
 const read = (runId: string) => app.api<{ run: RunView }>('GET', `/api/report-runs/${runId}`);
 const retry = (runId: string) => app.api<Start>('POST', `/api/report-runs/${runId}/retry`, {});
-const begin = (runId: string) => app.api<{ run: RunView }>('POST', `/api/workshop/runs/${runId}/begin`, {});
-const finish = (runId: string) => app.api<{ run: RunView }>('POST', `/api/workshop/runs/${runId}/finish`, {});
-const failNext = () => app.api('POST', '/api/workshop/config', { failNextGeneration: true });
+const begin = (runId: string) => app.api<{ run: RunView }>('POST', `/api/ops/runs/${runId}/begin`, {});
+const finish = (runId: string) => app.api<{ run: RunView }>('POST', `/api/ops/runs/${runId}/finish`, {});
+const failNext = () => app.api('POST', '/api/ops/config', { failNextGeneration: true });
 
 async function failedRun(id = 'insp-001'): Promise<RunView> {
   await failNext();
@@ -134,7 +134,7 @@ describe('AC-05 safe retry', () => {
   it('[AC-05] retry creates one child from the original snapshot and links the parent', async () => {
     const parent = await failedRun();
     const rev = fixtures.inspections[0]!;
-    await app.api('POST', '/api/workshop/inspection-revision', {
+    await app.api('POST', '/api/ops/inspection-revision', {
       inspectionId: 'insp-001',
       revision: rev.revision + 1,
       findings: [{ id: 'finding-revision-2', area: 'Exterior', severity: 'info', description: 'Revision two finding for snapshot testing.' }],

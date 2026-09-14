@@ -135,7 +135,7 @@ export class FixtureStore {
     return { inspection, vehicle };
   }
 
-  /** Workshop helper: replace the current revision and findings. Existing run snapshots are untouched. */
+  /** Operations helper: replace the current revision and findings. Existing run snapshots are untouched. */
   updateInspectionRevision(inspectionId: string, revision: number, findings: Finding[]): Inspection {
     const inspection = this.inspections.find((item) => item.id === inspectionId);
     if (!inspection) throw new ServiceError('INSPECTION_NOT_FOUND', `Inspection ${inspectionId} was not found.`);

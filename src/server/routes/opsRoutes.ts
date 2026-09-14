@@ -6,14 +6,14 @@ import type { ReportJobService } from '../reports/reportJobs.ts';
 import { asyncHandler, requireIdParam, requireObjectBody } from '../http.ts';
 
 /**
- * Workshop test controls. These exist only in the fictional teaching environment.
+ * Operations endpoints: reset, failure testing, scheduling mode and manual run control for this environment.
  * They must never be connected to real systems or expose filesystem/command operations.
  */
-export function createWorkshopRoutes(deps: { fixtures: FixtureStore; service: ReportJobService }): Router {
+export function createOpsRoutes(deps: { fixtures: FixtureStore; service: ReportJobService }): Router {
   const router = Router();
 
   router.get('/state', (_req, res) => {
-    res.json(deps.service.getWorkshopState());
+    res.json(deps.service.getOpsState());
   });
 
   router.post(
@@ -45,7 +45,7 @@ export function createWorkshopRoutes(deps: { fixtures: FixtureStore; service: Re
         }
         deps.service.setFailNextGeneration(body.failNextGeneration);
       }
-      res.json(deps.service.getWorkshopState());
+      res.json(deps.service.getOpsState());
     }),
   );
 

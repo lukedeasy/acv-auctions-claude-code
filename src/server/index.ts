@@ -12,7 +12,7 @@ const staticDir = process.env.INSPECTION_DESK_STATIC_DIR ?? path.resolve(here, '
 const { app } = createApp({ staticDir });
 
 const server = app.listen(port, host, () => {
-  console.log(`[inspection-desk] API listening on http://${host}:${port}  (fictional training data; restart resets state)`);
+  console.log(`[inspection-desk] API listening on http://${host}:${port}  (in-memory data; restarting the server restores the seed data)`);
 });
 
 function shutdown(): void {

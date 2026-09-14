@@ -19,7 +19,7 @@ const children = [
   spawn(npx, ['vite', '--clearScreen', 'false'], { cwd: root, env, stdio: 'inherit' }),
 ];
 
-console.log(`\n[inspection-desk] UI:  http://${host}:${uiPort}\n[inspection-desk] API: http://${host}:${apiPort}/api/health\n[inspection-desk] Fictional training data. Restarting the API resets sample state.\n`);
+console.log(`\n[inspection-desk] UI:  http://${host}:${uiPort}\n[inspection-desk] API: http://${host}:${apiPort}/api/health\n[inspection-desk] Data is kept in memory. Restarting the API restores the seed data.\n`);
 
 let stopping = false;
 function stopAll(code = 0) {

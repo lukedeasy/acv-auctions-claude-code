@@ -1,7 +1,7 @@
 [
   {
     "id": "veh-001",
-    "stockNumber": "TRAIN-101",
+    "stockNumber": "STK-20811",
     "year": 2021,
     "make": "Toyota",
     "model": "RAV4",
@@ -10,7 +10,7 @@
   },
   {
     "id": "veh-002",
-    "stockNumber": "TRAIN-102",
+    "stockNumber": "STK-20827",
     "year": 2020,
     "make": "Honda",
     "model": "Civic",

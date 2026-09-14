@@ -86,7 +86,7 @@ describe('[HOOK-01] check-report-change hook', () => {
     for (const payload of [
       relevantEdit('README.md'),
       relevantEdit('src/client/pages/VehiclesPage.tsx'),
-      relevantEdit('tests/acceptance/learner.spec.ts'),
+      relevantEdit('tests/acceptance/retry.spec.ts'),
       { ...relevantEdit('src/client/reports/ReportPanel.tsx'), tool_name: 'Read' },
       { ...relevantEdit('src/client/reports/ReportPanel.tsx'), hook_event_name: 'PreToolUse' },
       { ...relevantEdit('src/client/reports/ReportPanel.tsx'), tool_input: {} },

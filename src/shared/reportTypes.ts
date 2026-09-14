@@ -1,5 +1,5 @@
 // Shared data contracts for Inspection Desk. Contract version inspection-desk-1.0.
-// Everything here is fictional teaching data. Do not add real vehicle identifiers or people.
+// Shared domain types for vehicles, inspections, runs and reports.
 
 export const CONTRACT_VERSION = 'inspection-desk-1.0';
 
@@ -70,7 +70,7 @@ export interface RunView {
 
 export type SchedulerMode = 'automatic' | 'manual';
 
-export interface WorkshopState {
+export interface OpsState {
   mode: SchedulerMode;
   failNextGeneration: boolean;
   runs: RunView[];

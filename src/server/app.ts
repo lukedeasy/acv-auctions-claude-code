@@ -7,7 +7,7 @@ import { createLegacyGenerator, type LegacyGeneratorOptions } from './reports/le
 import { createReportJobService, type ReportJobService, type ReportJobServiceOptions } from './reports/reportJobs.ts';
 import { createReadRoutes } from './routes/readRoutes.ts';
 import { createReportRoutes } from './routes/reports.ts';
-import { createWorkshopRoutes } from './routes/workshopRoutes.ts';
+import { createOpsRoutes } from './routes/opsRoutes.ts';
 
 export interface AppOptions {
   fixtureDir?: string;
@@ -34,7 +34,7 @@ export function createApp(options: AppOptions = {}): AppContext {
 
   app.use('/api', createReadRoutes({ fixtures, service }));
   app.use('/api', createReportRoutes({ service, legacy }));
-  app.use('/api/workshop', createWorkshopRoutes({ fixtures, service }));
+  app.use('/api/ops', createOpsRoutes({ fixtures, service }));
 
   app.use('/api', (_req, res) => {
     res.status(404).json(errorBody('NOT_FOUND', 'Unknown API path.'));

@@ -4,8 +4,6 @@ These are the product owner's answers for the workshop assignment. Everyone gets
 Use them to resolve the ticket's ambiguities. Do not invent additional company rules; if a question is
 not answered here, record it as an open decision in SPEC.md.
 
-All rules describe the fictional teaching application. They are not any company's production policy.
-
 ## What the user sees
 
 | Situation | Decision |

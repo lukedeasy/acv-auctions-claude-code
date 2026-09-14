@@ -36,7 +36,7 @@ describe('[BASE-01] prepared read routes', () => {
   });
 
   it('[BASE-01] legacy generation returns the expected document and stores a legacy record', async () => {
-    await app.api('POST', '/api/workshop/reset', {});
+    await app.api('POST', '/api/ops/reset', {});
     const res = await app.api<{ runId: string; report: unknown }>('POST', '/api/inspections/insp-001/report', {});
     expect(res.status).toBe(201);
     expect(res.body.report).toEqual(fixtures.expectedReports[0]);
@@ -49,21 +49,21 @@ describe('[BASE-01] prepared read routes', () => {
   });
 
   it('[BASE-01] injected legacy failure returns 503 and stores nothing', async () => {
-    await app.api('POST', '/api/workshop/reset', {});
-    await app.api('POST', '/api/workshop/config', { failNextGeneration: true });
+    await app.api('POST', '/api/ops/reset', {});
+    await app.api('POST', '/api/ops/config', { failNextGeneration: true });
     const res = await app.api<{ error: { code: string; message: string } }>('POST', '/api/inspections/insp-002/report', {});
     expect(res.status).toBe(503);
     expect(res.body.error).toEqual({ code: 'SIMULATED_GENERATION_FAILURE', message: 'Report generation failed. Try again.' });
     const list = await app.api<{ runs: unknown[] }>('GET', '/api/inspections/insp-002/reports');
     expect(list.body.runs).toHaveLength(0);
-    const state = await app.api<{ failNextGeneration: boolean }>('GET', '/api/workshop/state');
+    const state = await app.api<{ failNextGeneration: boolean }>('GET', '/api/ops/state');
     expect(state.body.failNextGeneration).toBe(false);
   });
 
   it('[BASE-01] request validation: missing object body is 400, unknown API path is JSON 404', async () => {
     const noBody = await fetch(`${app.baseUrl}/api/inspections/insp-001/report`, { method: 'POST' });
     expect(noBody.status).toBe(400);
-    const arrayBody = await app.api<{ error: { code: string } }>('POST', '/api/workshop/reset', []);
+    const arrayBody = await app.api<{ error: { code: string } }>('POST', '/api/ops/reset', []);
     expect(arrayBody.status).toBe(400);
     expect(arrayBody.body.error.code).toBe('INVALID_REQUEST');
     const unknown = await app.api<{ error: { code: string } }>('GET', '/api/nope');
@@ -71,31 +71,31 @@ describe('[BASE-01] prepared read routes', () => {
     expect(unknown.body.error.code).toBe('NOT_FOUND');
   });
 
-  it('[BASE-01] workshop controls: reset, config validation, revision helper', async () => {
-    await app.api('POST', '/api/workshop/reset', {});
-    const bad = await app.api<{ error: { code: string } }>('POST', '/api/workshop/config', { mode: 'sometimes' });
+  it('[BASE-01] operations endpoints: reset, config validation, revision helper', async () => {
+    await app.api('POST', '/api/ops/reset', {});
+    const bad = await app.api<{ error: { code: string } }>('POST', '/api/ops/config', { mode: 'sometimes' });
     expect(bad.status).toBe(400);
-    const unknownKey = await app.api<{ error: { code: string } }>('POST', '/api/workshop/config', { speed: 'fast' });
+    const unknownKey = await app.api<{ error: { code: string } }>('POST', '/api/ops/config', { speed: 'fast' });
     expect(unknownKey.status).toBe(400);
-    const manual = await app.api<{ mode: string }>('POST', '/api/workshop/config', { mode: 'manual' });
+    const manual = await app.api<{ mode: string }>('POST', '/api/ops/config', { mode: 'manual' });
     expect(manual.body.mode).toBe('manual');
-    const rev = await app.api<{ inspection: { revision: number } }>('POST', '/api/workshop/inspection-revision', {
+    const rev = await app.api<{ inspection: { revision: number } }>('POST', '/api/ops/inspection-revision', {
       inspectionId: 'insp-001',
       revision: 2,
       findings: [{ id: 'finding-revision-2', area: 'Exterior', severity: 'info', description: 'Revision two finding for snapshot testing.' }],
     });
     expect(rev.status).toBe(200);
     expect(rev.body.inspection.revision).toBe(2);
-    const lower = await app.api<{ error: { code: string } }>('POST', '/api/workshop/inspection-revision', { inspectionId: 'insp-001', revision: 2, findings: [] });
+    const lower = await app.api<{ error: { code: string } }>('POST', '/api/ops/inspection-revision', { inspectionId: 'insp-001', revision: 2, findings: [] });
     expect(lower.status).toBe(400);
-    const after = await app.api<{ mode: string; runs: unknown[] }>('POST', '/api/workshop/reset', {});
+    const after = await app.api<{ mode: string; runs: unknown[] }>('POST', '/api/ops/reset', {});
     expect(after.body.mode).toBe('automatic');
     const restored = await app.api<{ inspection: { revision: number } }>('GET', '/api/inspections/insp-001');
     expect(restored.body.inspection.revision).toBe(1);
   });
 
   it('[BASE-01] starter run routes exist and report NOT_IMPLEMENTED until the exercise is done', async () => {
-    // These three are the learner's work. On the unmodified starter they answer 501.
+    // These three are the open ticket work. On the unmodified starter they answer 501.
     // After modernization they answer 202/200 and this assertion is no longer relevant; the acceptance checks take over.
     const start = await app.api<{ error?: { code: string } }>('POST', '/api/inspections/insp-001/report-runs', {});
     expect([501, 202, 200]).toContain(start.status);

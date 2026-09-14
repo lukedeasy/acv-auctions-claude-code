@@ -38,7 +38,7 @@ export function VehiclesPage() {
           </button>
         </div>
       ) : null}
-      {state.kind === 'ready' && state.vehicles.length === 0 ? <p>No sample vehicles.</p> : null}
+      {state.kind === 'ready' && state.vehicles.length === 0 ? <p>No vehicles.</p> : null}
       {state.kind === 'ready' && state.vehicles.length > 0 ? (
         <table className="responsive-table">
           <thead>

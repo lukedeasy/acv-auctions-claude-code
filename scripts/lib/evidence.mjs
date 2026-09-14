@@ -143,7 +143,7 @@ export function checkPlan(root) {
  *    an earlier commit than the one that adds this evidence);
  *  - "Readiness:" agrees with that file: ready_for_merge only when every required check passed,
  *    changes_required only when something failed or "Unresolved:" names outstanding work.
- * The learner sequence is therefore: run `--stage m6 --json workshop/evidence/m6-check.json`, write the
+ * The sequence is therefore: run `--stage m6 --json workshop/evidence/m6-check.json`, write the
  * entry from that result, then run `--stage evidence`. Nothing here requires a file to contain its own commit ID.
  */
 export function checkM6Evidence(root) {

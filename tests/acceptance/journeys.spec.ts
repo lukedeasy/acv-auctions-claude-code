@@ -118,7 +118,7 @@ test.describe('acceptance journeys', () => {
     await finish(request, parent.id);
     await expect(p.retry).toBeEnabled();
     // Change the current inspection revision before retrying: the retry must use the original snapshot.
-    const res = await request.post('/api/workshop/inspection-revision', { data: revisionTwo });
+    const res = await request.post('/api/ops/inspection-revision', { data: revisionTwo });
     expect(res.ok()).toBe(true);
     await p.retry.click();
     await expect(p.status).toHaveText(/Requesting retry…|Report queued/);

@@ -4,7 +4,7 @@
     "vehicleId": "veh-001",
     "revision": 1,
     "inspectedAt": "2026-08-20T14:00:00.000Z",
-    "inspectorLabel": "Workshop inspector A",
+    "inspectorLabel": "D. Okafor",
     "findings": [
       {
         "id": "finding-001",
@@ -25,7 +25,7 @@
     "vehicleId": "veh-002",
     "revision": 1,
     "inspectedAt": "2026-08-20T15:00:00.000Z",
-    "inspectorLabel": "Workshop inspector B",
+    "inspectorLabel": "L. Whitfield",
     "findings": [
       {
         "id": "finding-003",

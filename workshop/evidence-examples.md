@@ -1,6 +1,6 @@
 # Evidence examples: insufficient, adequate, strong
 
-Fictional examples so everyone knows the standard before scoring. They are not observed sessions.
+Worked examples so everyone knows the standard before scoring. They are illustrations, not observed sessions.
 
 ## M1 context/model decision
 

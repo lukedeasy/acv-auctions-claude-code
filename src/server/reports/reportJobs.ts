@@ -5,7 +5,7 @@ import {
   type RunView,
   type SchedulerMode,
   type Vehicle,
-  type WorkshopState,
+  type OpsState,
 } from '../../shared/reportTypes.ts';
 import { ServiceError } from '../errors.ts';
 import type { FixtureStore } from '../fixtures/loadFixtures.ts';
@@ -26,7 +26,7 @@ import {
  * retry validation and the workshop test controls. Route handlers call this service;
  * they do not build reports or touch the store directly.
  *
- * Learners connect the application to this service. They do not build a job queue.
+ * Route handlers connect the application to this service. They do not build a job queue.
  */
 export interface ReportJobServiceOptions {
   fixtures: FixtureStore;
@@ -55,13 +55,13 @@ export interface ReportJobService {
   recordLegacyCompleted(snapshot: { inspection: Inspection; vehicle: Vehicle }, report: ReportDocument, startedAt: string): RunView;
   /** Read the "fail next generation" flag and clear it. Used when a new attempt is created. */
   consumeFailNextGeneration(): boolean;
-  // Workshop controls
-  getWorkshopState(): WorkshopState;
-  setMode(mode: SchedulerMode): WorkshopState;
-  setFailNextGeneration(value: boolean): WorkshopState;
+  // Operations controls
+  getOpsState(): OpsState;
+  setMode(mode: SchedulerMode): OpsState;
+  setFailNextGeneration(value: boolean): OpsState;
   beginAttempt(runId: string): RunView;
   finishAttempt(runId: string): RunView;
-  reset(): WorkshopState;
+  reset(): OpsState;
 }
 
 export function createReportJobService(options: ReportJobServiceOptions): ReportJobService {
@@ -231,7 +231,7 @@ export function createReportJobService(options: ReportJobServiceOptions): Report
       return value;
     },
 
-    getWorkshopState() {
+    getOpsState() {
       return { mode, failNextGeneration, runs: store.list().map(toRunView) };
     },
 
@@ -240,12 +240,12 @@ export function createReportJobService(options: ReportJobServiceOptions): Report
         throw new ServiceError('INVALID_TRANSITION', 'Scheduling mode can only change while no attempt is pending or running.');
       }
       mode = nextMode;
-      return service.getWorkshopState();
+      return service.getOpsState();
     },
 
     setFailNextGeneration(value) {
       failNextGeneration = value;
-      return service.getWorkshopState();
+      return service.getOpsState();
     },
 
     beginAttempt(runId) {
@@ -265,7 +265,7 @@ export function createReportJobService(options: ReportJobServiceOptions): Report
       fixtures.reset();
       mode = 'automatic';
       failNextGeneration = false;
-      return service.getWorkshopState();
+      return service.getOpsState();
     },
   };
 

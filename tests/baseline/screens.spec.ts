@@ -17,14 +17,14 @@ test.describe('[BASE-01] screens', () => {
   test('[BASE-01] vehicles list renders fixture rows and links to inspections', async ({ page }) => {
     await page.goto('/vehicles');
     await expect(page.getByRole('heading', { name: 'Inspection Desk' })).toBeVisible();
-    await expect(page.getByText('Fictional training data')).toBeVisible();
-    await expect(page.getByTestId('workshop-controls')).toContainText('WORKSHOP SIMULATION');
+    await expect(page.getByTestId('ops-panel')).toContainText('Operations');
+    await expect(page.getByTestId('ops-panel')).toContainText('STAGING');
     const rows = page.locator('tbody tr');
     await expect(rows).toHaveCount(2);
-    await expect(rows.nth(0)).toContainText('TRAIN-101');
+    await expect(rows.nth(0)).toContainText('STK-20811');
     await expect(rows.nth(0)).toContainText('2021 Toyota RAV4');
     await expect(rows.nth(0)).toContainText('42,310');
-    await expect(rows.nth(1)).toContainText('TRAIN-102');
+    await expect(rows.nth(1)).toContainText('STK-20827');
     await rows.nth(0).getByRole('link', { name: 'Open inspection' }).click();
     await expect(page).toHaveURL(/\/inspections\/insp-001$/);
     await expect(page.getByRole('heading', { name: '2021 Toyota RAV4' })).toBeVisible();
@@ -32,7 +32,7 @@ test.describe('[BASE-01] screens', () => {
 
   test('[BASE-01] inspection screen shows details, findings and the report panel', async ({ page }) => {
     await openInspection(page, 'insp-002');
-    await expect(page.getByText('TRAIN-102')).toBeVisible();
+    await expect(page.getByText('STK-20827')).toBeVisible();
     await expect(page.getByText('61,205')).toBeVisible();
     await expect(page.getByText('revision 1')).toBeVisible();
     await expect(page.getByRole('row', { name: /Tires/ })).toContainText('major');
@@ -81,17 +81,17 @@ test.describe('[BASE-01] screens', () => {
     await expect(page).toHaveURL(new RegExp(`/reports/${runId}$`));
   });
 
-  test('[BASE-01] workshop controls panel can reset, toggle failure and switch mode', async ({ page, request }) => {
+  test('[BASE-01] operations panel can reset, toggle failure and switch mode', async ({ page, request }) => {
     await page.goto('/vehicles');
-    await page.getByTestId('ws-fail-next').check();
-    await expect(page.getByTestId('ws-fail-next')).toBeChecked();
-    await page.getByTestId('ws-mode-manual').check();
-    await expect(page.getByTestId('ws-mode-manual')).toBeChecked();
-    await page.getByTestId('ws-reset').click();
-    await expect(page.getByTestId('ws-message')).toContainText('Reset sample data: done');
-    await expect(page.getByTestId('ws-mode-automatic')).toBeChecked();
-    await expect(page.getByTestId('ws-fail-next')).not.toBeChecked();
-    const s = await request.get('/api/workshop/state');
+    await page.getByTestId('ops-fail-next').check();
+    await expect(page.getByTestId('ops-fail-next')).toBeChecked();
+    await page.getByTestId('ops-mode-manual').check();
+    await expect(page.getByTestId('ops-mode-manual')).toBeChecked();
+    await page.getByTestId('ops-reset').click();
+    await expect(page.getByTestId('ops-message')).toContainText('Reset data: done');
+    await expect(page.getByTestId('ops-mode-automatic')).toBeChecked();
+    await expect(page.getByTestId('ops-fail-next')).not.toBeChecked();
+    const s = await request.get('/api/ops/state');
     expect(((await s.json()) as { runs: unknown[] }).runs).toHaveLength(0);
   });
 
@@ -99,7 +99,7 @@ test.describe('[BASE-01] screens', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/vehicles');
     await expect(page.getByRole('link', { name: 'Open inspection' }).first()).toBeVisible();
-    await expect(page.getByTestId('workshop-controls')).toBeVisible();
+    await expect(page.getByTestId('ops-panel')).toBeVisible();
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(width).toBeLessThanOrEqual(390);
   });

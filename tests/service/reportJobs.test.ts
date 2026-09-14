@@ -56,7 +56,7 @@ describe('start', () => {
     const a = service.start('insp-001');
     const b = service.start('insp-002');
     expect(a.run.id).not.toBe(b.run.id);
-    expect(service.getWorkshopState().runs).toHaveLength(2);
+    expect(service.getOpsState().runs).toHaveLength(2);
   });
 
   it('rejects an unknown inspection', () => {
@@ -132,7 +132,7 @@ describe('failure injection', () => {
     service.setMode('manual');
     service.setFailNextGeneration(true);
     const a = service.start('insp-001');
-    expect(service.getWorkshopState().failNextGeneration).toBe(false);
+    expect(service.getOpsState().failNextGeneration).toBe(false);
     const reused = service.start('insp-001');
     expect(reused.reused).toBe(true);
     const b = service.start('insp-002');

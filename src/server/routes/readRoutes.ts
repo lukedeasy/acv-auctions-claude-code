@@ -5,7 +5,7 @@ import type { FixtureStore } from '../fixtures/loadFixtures.ts';
 import type { ReportJobService } from '../reports/reportJobs.ts';
 import { asyncHandler, requireIdParam } from '../http.ts';
 
-/** Prepared read endpoints. Learners do not need to change these. */
+/** Read endpoints. */
 export function createReadRoutes(deps: { fixtures: FixtureStore; service: ReportJobService }): Router {
   const router = Router();
 

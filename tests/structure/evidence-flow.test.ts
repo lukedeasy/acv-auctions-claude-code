@@ -83,7 +83,7 @@ describe('[EVIDENCE-FLOW] M6 evidence cycle', () => {
     expect(evidenceLine).toContain('DOC-M6');
   });
 
-  it('first run: the entry cites a check file that does not exist yet → clear failure telling the learner the order', () => {
+  it('first run: the entry cites a check file that does not exist yet → clear failure telling the author the order', () => {
     const dir = projectCopy('first-run');
     m6Entry(dir);
     const problems = checkM6Evidence(dir);

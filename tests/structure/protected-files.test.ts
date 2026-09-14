@@ -1,6 +1,6 @@
 /**
  * [SYS-03] Protected files must match the starter manifest in scripts/protected-manifest.json.
- * Learners may add tests; they may not change fixtures, expected reports, the lockfile, the supplied
+ * Contributors may add tests; they may not change fixtures, expected reports, the lockfile, the supplied
  * service or the check definitions. This public copy is feedback; the trainer's private manifest is authoritative.
  */
 import { createHash } from 'node:crypto';

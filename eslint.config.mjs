@@ -13,7 +13,7 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       // The starter resets loading state synchronously when a route parameter changes. That pattern is
-      // deliberate and easy to read for a teaching app, so the React Compiler-oriented rule is off here.
+      // deliberate and easy to read here, so the React Compiler-oriented rule is off here.
       'react-hooks/set-state-in-effect': 'off',
     },
     languageOptions: { globals: { ...globals.browser } },

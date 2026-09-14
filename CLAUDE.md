@@ -1,7 +1,7 @@
 # Inspection Desk
 
-Fictional vehicle-inspection report workbench. TypeScript, React + Vite (client), Express (server),
-Vitest + Playwright (checks). Node 24. In-memory sample data; restarting the API resets it.
+Vehicle-inspection report workbench. TypeScript, React + Vite (client), Express (server),
+Vitest + Playwright (checks). Node 24. Data is kept in memory; restarting the API restores the seed data.
 
 ## Commands
 
@@ -12,7 +12,7 @@ Vitest + Playwright (checks). Node 24. In-memory sample data; restarting the API
 
 ## Where things are
 
-- Learner area: `src/client/reports/ReportPanel.tsx`, `src/client/reports/reportApi.ts`,
+- Change area for the report-generation ticket: `src/client/reports/ReportPanel.tsx`, `src/client/reports/reportApi.ts`,
   `src/server/routes/reports.ts`, new tests under `tests/acceptance/` (new files only).
 - Prepared, read but do not change: `src/server/reports/reportJobs.ts` (job service: start/retry/get/list,
   one active run per inspection, retry rules), `buildReport.ts`, `reportStore.ts`, `scheduler.ts`,
@@ -26,4 +26,4 @@ Vitest + Playwright (checks). Node 24. In-memory sample data; restarting the API
 - New route handlers call the job service. They never import `buildReport` or `ReportStore` (SYS-02).
 - Do not edit protected files (SYS-03). Add new test files instead of changing supplied ones.
 - Validate HTTP input at the boundary; a TypeScript cast is not validation.
-- Prefer small, reviewable changes; explain any change outside the learner area in PLAN.md.
+- Prefer small, reviewable changes; explain any change outside the change area in PLAN.md.
